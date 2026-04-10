@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Планировщик смен - Система управления персоналом</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f472e7 0%, #f472e7 100%);
+            min-height: 100vh;
+            padding: 30px 24px;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+        }
+
+        .schedule-panel {
+            flex: 3;
+            min-width: 280px;
+        }
+
+        .stats-panel {
+            flex: 1.2;
+            min-width: 280px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 24px 28px;
+            margin-bottom: 28px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 0px;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 24px 42px -14px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 1.85rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #1A2A3F, #2C4C6C);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f3b4c;
+            border-left: 5px solid #2c7da0;
+            padding-left: 16px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-weight: 600;
+            color: #1f3b4c;
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+        }
+
+        .form-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            flex: 1 1 180px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #2c5a74;
+        }
+
+        select, button, input {
+            padding: 10px 14px;
+            border-radius: 60px;
+            border: 1px solid #cbdbe0;
+            background: rgb(119, 189, 240);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1f2f3e;
+        }
+
+        input {
+            cursor: text;
+            background: white;
+        }
+
+        select:focus, button:focus, input:focus {
+            outline: none;
+            border-color: #2c7da0;
+            box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
+        }
+
+        button {
+            background: #2c7da0;
+            color: white;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background: #1f5e7c;
+            transform: translateY(-1px);
+        }
+
+        .alert-card {
+            background: #fff9e8;
+            border-left: 8px solid #f4b942;
+            padding: 14px 18px;
+            border-radius: 24px;
+            margin: 20px 0 12px;
+            font-size: 0.9rem;
+            color: #7a6300;
+            font-weight: 500;
+        }
+
+        .employees-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .team-card {
+            background: #ffffffcc;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .team-header {
+            background: #eef3f7;
+            padding: 14px 24px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #1e4a6e;
+            border-bottom: 2px solid #cbdde8;
+        }
+
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .modern-table th {
+            text-align: left;
+            padding: 14px 12px;
+            background-color: #f8fafc;
+            color: #2c5a74;
+            font-weight: 600;
+            border-bottom: 1px solid #dee4ec;
+        }
+
+        .modern-table td {
+            padding: 12px;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: top;
+            color: #1f2f3e;
+        }
+
+        .modern-table tr:hover {
+            background: #f1f9fe;
+        }
+
+        .badge-warning {
+            background: #ffeed9;
+            color: #c26b1a;
+            font-weight: bold;
+            padding: 2px 10px;
+            border-radius: 40px;
+            display: inline-block;
+            font-size: 0.8rem;
+        }
+
+        .shift-chip {
+            background: #eef2fa;
+            border-radius: 24px;
+            padding: 4px 10px;
+            margin: 3px 4px 3px 0;
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #1f4e6e;
+        }
+
+        .action-icon {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 6px 8px;
+            margin: 0 2px;
+            border-radius: 30px;
+            transition: all 0.1s;
+        }
+
+        .action-icon:hover {
+            background: #e2e8f0;
+            transform: scale(1.05);
+        }
+
+        .detail-overlay {
+            background: rgba(0, 0, 0, 0.6);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(6px);
+        }
+
+        .detail-card {
+            background: white;
+            max-width: 550px;
+            width: 90%;
+            border-radius: 40px;
+            padding: 24px;
+            box-shadow: 0 40px 60px rgba(0,0,0,0.3);
+            animation: fadeSlide 0.2s ease;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .shift-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            margin: 8px 0;
+            padding: 10px 16px;
+            border-radius: 60px;
+        }
+
+        .modal-modern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 28px;
+            border-radius: 36px;
+            width: 340px;
+            text-align: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .btn-secondary {
+            background: #cddfe7;
+            color: #1f3b4c;
+        }
+
+        .btn-danger {
+            background: #c44536;
+        }
+
+        .stats-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1f4e6c;
+        }
+
+        hr {
+            margin: 16px 0;
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, #cbdde8, transparent);
+        }
+
+        .auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #f472e7 0%, #d45ac8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .auth-card input {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #eef3f7;
+            border-radius: 10px;
+        }
+
+        .logout-btn {
+            background: #c44536;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+        }
+
+        .admin-badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-left: 10px;
+        }
+
+        .user-badge {
+            background: #4ecdc4;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-left: 10px;
+        }
+
+        .export-btn {
+            background: #27ae60;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .button-group {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .auto-save-btn {
+            background: #e74c3c;
+        }
+
+        .restore-btn {
+            background: #3498db;
+        }
+    </style>
+</head>
+<body>
+
+<div id="authContainer" class="auth-container">
+    <div class="auth-card">
+        <h2>🔐 Вход в систему</h2>
+        <input type="text" id="loginUsername" placeholder="Логин" autocomplete="off">
+        <input type="password" id="loginPassword" placeholder="Пароль">
+        <button onclick="login()" style="width: 100%; margin-top: 10px;">Войти</button>
+        <hr style="margin: 20px 0;">
+        <p style="font-size: 0.8rem; color: #666;">Демо-аккаунты:<br>
+        <strong>Администратор:</strong> admin / admin123<br>
+        <strong>Сотрудник:</strong> user / user123</p>
+    </div>
+</div>
+
+<div id="mainApp" style="display: none;">
+    <div class="dashboard">
+        <div class="schedule-panel">
+            <div class="glass-card">
+                <div class="user-info" id="userInfo">
+                    <span id="userNameDisplay">Загрузка...</span>
+                    <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+                </div>
+                <h1>📅 Планировщик смен</h1>
+                <p style="color: #4c6a7c; margin-bottom: 20px;">Управление индивидуальными графиками</p>
+
+                <div class="button-group">
+                    <button id="excelExportBtn" class="export-btn">📊 Экспорт в Excel</button>
+                    <button id="restoreBtn" class="restore-btn">🔄 Восстановить из бэкапа</button>
+                    <button id="autoSaveToggle" class="auto-save-btn">⏸️ Автосохранение Вкл</button>
+                </div>
+
+                <div class="form-grid" id="filtersBlock">
+                    <div class="input-group">
+                        <label>🍓 Альянс</label>
+                        <select id="deptSelect">
+                            <option value="">— Выберите —</option>
+                            <option value="СоняПро">СоняПро</option>
+                            <option value="Фиданяшка">Фиданяшка</option>
+                            <option value="Ольхон">Ольхон</option>
+                            <option value="Даритель">Даритель</option>
+                            <option value="Аня Свирепая">Аня Свирепая</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>🦁 Команда</label>
+                        <select id="teamSelect" disabled>
+                            <option value="">— Сначала выберите альянс —</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>🐀 Сотрудник</label>
+                        <select id="workerSelect" disabled>
+                            <option value="">— Выберите команду —</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="addFormBlock" style="display: none;">
+                    <hr>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>📆 Дата</label>
+                            <select id="datePicker"></select>
+                        </div>
+                        <div class="input-group">
+                            <label>⏱️ Начало смены</label>
+                            <select id="startHourSelect">
+                                <option value="">-- Время --</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>🏁 Конец смены</label>
+                            <select id="endHourSelect" disabled>
+                                <option value="">-- Сначала выберите начало смены --</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>&nbsp;</label>
+                            <button id="addShiftBtn">➕ Добавить смену</button>
+                        </div>
+                    </div>
+                    <div id="warningMsg" class="alert-card" style="display: none;"></div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h2>🌺 Сводка по персоналу</h2>
+                <div id="employeesListContainer">
+                    <p style="color: #6b8a9e;">Нет добавленных смен. Выберите сотрудника и добавьте график.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <div class="glass-card">
+                <h2>📊 Аналитика</h2>
+                <div id="statsContent">
+                    <p>Загрузка данных...</p>
+                </div>
+            </div>
+            <div class="glass-card">
+                <h2>⏳ Нормирование</h2>
+                <div id="normInfo">
+                    <p style="font-size: 0.85rem;">✅ Идеально: не более 6 смен подряд<br>✅ Смена ≤ 12ч<br>✅ Распределение будни/выходные</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="globalModal" style="display: none;" class="modal-modern">
+    <div class="modal-card">
+        <h3 style="margin-bottom: 12px;">🗑️ Подтверждение</h3>
+        <p id="modalMsgText">Вы уверены?</p>
+        <div class="btn-group">
+            <button id="modalCancelBtn" class="btn-secondary">Отмена</button>
+            <button id="modalConfirmBtn" class="btn-danger">Удалить</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========== СИСТЕМА АВТОРИЗАЦИИ ==========
+    let currentUser = null;
+    
+    const usersDB = {
+        'admin': { password: 'admin123', role: 'admin', name: 'Администратор' },
+        'user': { password: 'user123', role: 'user', name: 'Сотрудник' }
+    };
+
+    function login() {
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        if (usersDB[username] && usersDB[username].password === password) {
+            currentUser = {
+                username: username,
+                role: usersDB[username].role,
+                name: usersDB[username].name
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            initApp();
+        } else {
+            alert('Неверный логин или пароль!');
+        }
+    }
+
+    function logout() {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        document.getElementById('authContainer').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+    }
+
+    function checkAuth() {
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            initApp();
+        }
+    }
+
+    function isAdmin() {
+        return currentUser && currentUser.role === 'admin';
+    }
+
+    // ========== ОСНОВНОЙ КОД ПРИЛОЖЕНИЯ ==========
+    const departmentsData = {
+        'СоняПро': [
+            { name: 'Бригада «Джастин Бибер»', workers: ['Воронин Аркадий Львович', 'Воронина Злата Аркадьевна', 'Снегирев Павел Игоревич'] },
+            { name: 'Отряд «Билан»', workers: ['Морозова Диана Сергеевна', 'Морозов Тимур Денисович', 'Громов Вадим Петрович'] }
+        ],
+        'Фиданяшка': [
+            { name: 'Звено «Номер один»', workers: ['Ким Елена Викторовна', 'Ким Андрей Владимирович', 'Цой Дмитрий Юрьевич'] },
+            { name: 'Команда «Лютые»', workers: ['Пак Светлана Игоревна', 'Ли Максим Александрович', 'Чой Татьяна Алексеевна'] }
+        ],
+        'Ольхон': [
+            { name: 'Группа «Аналитики»', workers: ['Ильинская Анастасия Павловна', 'Ильинский Роман Сергеевич', 'Соболева Вера Дмитриевна'] },
+            { name: 'Кластер «Пифогор»', workers: ['Тихонов Артем Валерьевич', 'Тихонова Мария Артемовна', 'Ковальчук Олег Николаевич'] }
+        ],
+        'Даритель': [
+            { name: 'Морская пехота', workers: ['Бережной Григорий Алексеевич', 'Бережная Людмила Григорьевна', 'Штормова Антонина Викторовна'] },
+            { name: 'Маяк', workers: ['Солнцев Даниил Евгеньевич', 'Солнцева Ксения Данииловна', 'Ветров Александр Ильич'] }
+        ],
+        'Аня Свирепая': [
+            { name: 'Макароны по флотски', workers: ['Бережной Григорий Алексеевич', 'Бережная Людмила Григорьевна', 'Штормова Антонина Викторовна'] },
+            { name: 'Мясо', workers: ['Солнцев Даниил Евгеньевич', 'Солнцева Ксения Данииловна', 'Ветров Александр Ильич'] }
+        ]
+    };
+
+    let allStaff = JSON.parse(localStorage.getItem('workforce_v2') || '[]');
+    let autoSaveInterval = null;
+    let autoSaveEnabled = true;
+
+    // ========== ФУНКЦИИ АВТОСОХРАНЕНИЯ ==========
+    function autoExportToJSON() {
+        const dataToSave = {
+            lastUpdated: new Date().toISOString(),
+            employees: allStaff,
+            stats: {
+                totalShifts: allStaff.reduce((sum, emp) => sum + emp.shifts.length, 0),
+                totalEmployees: allStaff.length
+            }
+        };
+        
+        localStorage.setItem('workforce_v2_backup', JSON.stringify(dataToSave));
+        console.log('📦 Автосохранение выполнено в', new Date().toLocaleTimeString());
+        
+        const notify = document.createElement('div');
+        notify.textContent = '💾 Автосохранение';
+        notify.style.position = 'fixed';
+        notify.style.bottom = '20px';
+        notify.style.right = '20px';
+        notify.style.background = '#27ae60';
+        notify.style.color = 'white';
+        notify.style.padding = '8px 16px';
+        notify.style.borderRadius = '20px';
+        notify.style.fontSize = '12px';
+        notify.style.zIndex = '9999';
+        document.body.appendChild(notify);
+        setTimeout(() => notify.remove(), 2000);
+    }
+
+    function restoreFromBackup() {
+        const backup = localStorage.getItem('workforce_v2_backup');
+        if (backup) {
+            try {
+                const data = JSON.parse(backup);
+                if (confirm(`Найден бэкап от ${data.lastUpdated}. Восстановить?`)) {
+                    allStaff = data.employees;
+                    localStorage.setItem('workforce_v2', JSON.stringify(allStaff));
+                    renderAllTables();
+                    renderStats();
+                    alert('✅ Данные восстановлены из бэкапа!');
+                }
+            } catch(e) {
+                alert('❌ Ошибка восстановления бэкапа');
+            }
+        } else {
+            alert('❌ Бэкапов не найдено');
+        }
+    }
+
+    function startAutoSave() {
+        if (autoSaveInterval) clearInterval(autoSaveInterval);
+        autoSaveInterval = setInterval(() => {
+            if (allStaff.length > 0 && autoSaveEnabled) {
+                autoExportToJSON();
+            }
+        }, 5 * 60 * 1000);
+    }
+
+    function stopAutoSave() {
+        if (autoSaveInterval) {
+            clearInterval(autoSaveInterval);
+            autoSaveInterval = null;
+        }
+    }
+
+    // ========== ЭКСПОРТ В EXCEL (РАБОЧАЯ ВЕРСИЯ) ==========
+    function exportToExcel() {
+        try {
+            // Создаем CSV данные с разделителем точка с запятой
+            let csvContent = "\uFEFF"; // BOM для корректного UTF-8 в Excel
+            
+            // Заголовки (6 столбцов)
+            csvContent += "Альянс;Команда;Сотрудник;Дата;Начало смены;Конец смены\n";
+            
+            // Проверяем, есть ли данные
+            if (!allStaff || allStaff.length === 0) {
+                csvContent += "Нет данных;Нет данных;Нет данных;Нет данных;Нет данных;Нет данных\n";
+            } else {
+                // Собираем все смены сотрудников
+                let shiftsCount = 0;
+                allStaff.forEach(emp => {
+                    if (emp.shifts && emp.shifts.length > 0) {
+                        emp.shifts.forEach(shift => {
+                            const startTime = shift.startTime === 'off' ? 'Выходной' : (shift.startTime || '');
+                            const endTime = (shift.startTime !== 'off' && shift.endTime) ? shift.endTime : (shift.startTime === 'off' ? '-' : '');
+                            
+                            // Экранируем кавычки и экранируем точки с запятой
+                            const alliance = (emp.dept || '').replace(/;/g, ',');
+                            const team = (emp.team || '').replace(/;/g, ',');
+                            const name = (emp.name || '').replace(/;/g, ',');
+                            
+                            csvContent += `"${alliance}";"${team}";"${name}";${shift.date || ''};${startTime};${endTime}\n`;
+                            shiftsCount++;
+                        });
+                    }
+                });
+                
+                if (shiftsCount === 0) {
+                    csvContent += "Нет данных;Нет данных;Нет данных;Нет данных;Нет данных;Нет данных\n";
+                }
+            }
+            
+            // Создаем Blob и скачиваем
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            
+            const now = new Date();
+            const fileName = `schedule_${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}.csv`;
+            link.setAttribute("download", fileName);
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            const totalShifts = allStaff.reduce((sum, emp) => sum + (emp.shifts ? emp.shifts.length : 0), 0);
+            alert(`✅ Данные успешно выгружены!\n📁 Файл: ${fileName}\n📊 Всего смен: ${totalShifts}\n\n💡 Как открыть в Excel:\n1. Откройте Excel\n2. Данные → Из текстового файла\n3. Выберите файл и укажите разделитель "точка с запятой (;)"`);
+            
+        } catch (error) {
+            console.error('Ошибка при экспорте:', error);
+            alert('❌ Ошибка при экспорте: ' + error.message);
+        }
+    }
+
+    // ========== ФУНКЦИИ УДАЛЕНИЯ ==========
+    function deleteShiftFromWorker(workerIdx, shiftIdx) {
+        if (!isAdmin()) {
+            alert('Доступ запрещен! Только администратор может удалять смены.');
+            return;
+        }
+        
+        console.log('Удаление смены:', workerIdx, shiftIdx);
+        
+        if (allStaff[workerIdx] && allStaff[workerIdx].shifts[shiftIdx]) {
+            allStaff[workerIdx].shifts.splice(shiftIdx, 1);
+            
+            if (allStaff[workerIdx].shifts.length === 0) {
+                allStaff.splice(workerIdx, 1);
+                console.log('Сотрудник удален, так как не осталось смен');
+            }
+            
+            localStorage.setItem('workforce_v2', JSON.stringify(allStaff));
+            renderAllTables();
+            renderStats();
+            
+            const detailContainer = document.getElementById('detailContainer');
+            if (detailContainer) {
+                detailContainer.remove();
+            }
+            
+            if (autoSaveEnabled) autoExportToJSON();
+            
+            console.log('Смена удалена успешно');
+            alert('✅ Смена успешно удалена');
+        } else {
+            console.error('Ошибка: смена не найдена');
+            alert('❌ Ошибка: смена не найдена');
+        }
+    }
+
+    function deleteWholeWorker(workerIdx) {
+        if (!isAdmin()) {
+            alert('Доступ запрещен! Только администратор может удалять сотрудников.');
+            return;
+        }
+        
+        if (allStaff[workerIdx]) {
+            allStaff.splice(workerIdx, 1);
+            localStorage.setItem('workforce_v2', JSON.stringify(allStaff));
+            renderAllTables();
+            renderStats();
+            
+            const detailContainer = document.getElementById('detailContainer');
+            if (detailContainer) {
+                detailContainer.remove();
+            }
+            
+            if (autoSaveEnabled) autoExportToJSON();
+            alert('✅ Сотрудник успешно удален');
+        }
+    }
+
+    // ========== ФУНКЦИИ ОТОБРАЖЕНИЯ ==========
+    function renderAllTables() {
+        const container = document.getElementById('employeesListContainer');
+        if (!allStaff.length) {
+            container.innerHTML = '<p style="color: #6b8a9e; text-align:center;">✨ Нет графиков. Добавьте первую смену.</p>';
+            return;
+        }
+        
+        const grouped = {};
+        allStaff.forEach((emp, idx) => {
+            if (!grouped[emp.dept]) grouped[emp.dept] = {};
+            if (!grouped[emp.dept][emp.team]) grouped[emp.dept][emp.team] = [];
+            grouped[emp.dept][emp.team].push({ 
+                ...emp, 
+                originalIdx: idx
+            });
+        });
+
+        let html = '<div class="employees-grid">';
+        for (let dept in grouped) {
+            html += `<div class="team-card"><div class="team-header">🦄 ${dept}</div><table class="modern-table"><thead><tr><th>Команда</th><th>Сотрудник</th><th>Смены (дата, время)</th><th>Подряд</th><th>Будни%</th><th>Вых%</th><th></th></tr></thead><tbody>`;
+            for (let team in grouped[dept]) {
+                for (let emp of grouped[dept][team]) {
+                    const shiftsArr = emp.shifts;
+                    const total = shiftsArr.length;
+                    let weekdays = 0, weekends = 0;
+                    shiftsArr.forEach(s => {
+                        const day = new Date(s.date).getDay();
+                        (day>=1 && day<=5) ? weekdays++ : weekends++;
+                    });
+                    const percWeek = total ? ((weekdays/total)*100).toFixed(1) : '0';
+                    const percEnd = total ? ((weekends/total)*100).toFixed(1) : '0';
+                    let maxCons = 0;
+                    if (shiftsArr.length) {
+                        const dates = shiftsArr.map(s=>s.date).sort();
+                        let cur=1;
+                        for(let i=1;i<dates.length;i++){
+                            const diff = (new Date(dates[i])-new Date(dates[i-1]))/(86400000);
+                            diff===1 ? cur++ : cur=1;
+                            if(cur>maxCons) maxCons=cur;
+                        }
+                        if(maxCons===0) maxCons=1;
+                    }
+                    const consWarning = (maxCons > 6) ? '<span class="badge-warning">⚠️>6</span>' : maxCons;
+                    const shiftsPreview = shiftsArr.slice(0,2).map(s => `${s.date.slice(5)} ${s.startTime==='off'?'○':s.startTime}`).join(', ');
+                    const more = shiftsArr.length>2 ? ` +${shiftsArr.length-2}` : '';
+                    html += `<tr>
+                        <td>${team}</td>
+                        <td><strong>${emp.name}</strong></td>
+                        <td><span class="shift-chip">${shiftsPreview || '—'}</span>${more}</td>
+                        <td>${consWarning}</td>
+                        <td>${percWeek}%</td>
+                        <td>${percEnd}%</td>
+                        <td>
+                            <button class="action-icon" data-workeridx="${emp.originalIdx}" data-action="view">📋</button>
+                            ${isAdmin() ? '<button class="action-icon" data-workeridx="'+emp.originalIdx+'" data-action="deleteWorker">🗑️</button>' : ''}
+                        </td>
+                    </tr>`;
+                }
+            }
+            html += `</tbody></table></div>`;
+        }
+        html += '</div>';
+        container.innerHTML = html;
+
+        document.querySelectorAll('[data-action="view"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.dataset.workeridx);
+                showEmployeeDetailModal(idx);
+            });
+        });
+        
+        if (isAdmin()) {
+            document.querySelectorAll('[data-action="deleteWorker"]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(btn.dataset.workeridx);
+                    openConfirmModal(`Удалить сотрудника и все его смены?`, () => deleteWholeWorker(idx));
+                });
+            });
+        }
+    }
+
+    function showEmployeeDetailModal(workerIdx) {
+        const worker = allStaff[workerIdx];
+        if (!worker) {
+            console.error('Сотрудник не найден, индекс:', workerIdx);
+            alert('Ошибка: сотрудник не найден');
+            return;
+        }
+        
+        const existing = document.getElementById('detailContainer');
+        if(existing) existing.remove();
+
+        const modalDiv = document.createElement('div');
+        modalDiv.id = 'detailContainer';
+        modalDiv.className = 'detail-overlay';
+        modalDiv.innerHTML = `
+            <div class="detail-card">
+                <div style="display:flex; justify-content:space-between;">
+                    <h3>👤 ${worker.name}</h3>
+                    <button id="closeDetailBtn" style="background:pink; font-size:24px; border:none; cursor:pointer;">&times;</button>
+                </div>
+                <p>${worker.dept} · ${worker.team}</p>
+                <hr>
+                <div id="shiftsDetailList"></div>
+                ${isAdmin() ? '<button id="deleteWorkerDetailBtn" style="margin-top:16px; background:#c44536; border:none; padding:8px 16px; cursor:pointer;">🗑️ Удалить сотрудника</button>' : ''}
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+        
+        const shiftsDiv = modalDiv.querySelector('#shiftsDetailList');
+        if (worker.shifts.length === 0) {
+            shiftsDiv.innerHTML = '<p>Нет смен</p>';
+        } else {
+            worker.shifts.forEach((sh, sidx) => {
+                const row = document.createElement('div');
+                row.className = 'shift-row';
+                const dateObj = new Date(sh.date);
+                const weekday = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][dateObj.getDay()];
+                const timeStr = sh.startTime === 'off' ? 'Выходной' : `${sh.startTime} → ${sh.endTime || ''}`;
+                row.innerHTML = `
+                    <span><strong>${sh.date} (${weekday})</strong> ${timeStr}</span>
+                    ${isAdmin() ? '<button class="action-icon delete-shift-btn" data-shiftidx="'+sidx+'" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">❌</button>' : ''}
+                `;
+                shiftsDiv.appendChild(row);
+            });
+            
+            if (isAdmin()) {
+                shiftsDiv.querySelectorAll('.delete-shift-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const shiftIdx = parseInt(btn.dataset.shiftidx);
+                        openConfirmModal('Удалить эту смену?', () => {
+                            deleteShiftFromWorker(workerIdx, shiftIdx);
+                            modalDiv.remove();
+                        });
+                    });
+                });
+            }
+        }
+        
+        document.getElementById('closeDetailBtn').onclick = () => modalDiv.remove();
+        
+        if (isAdmin()) {
+            const deleteBtn = document.getElementById('deleteWorkerDetailBtn');
+            if (deleteBtn) {
+                deleteBtn.onclick = () => {
+                    openConfirmModal(`Удалить сотрудника ${worker.name}?`, () => {
+                        deleteWholeWorker(workerIdx);
+                        modalDiv.remove();
+                    });
+                };
+            }
+        }
+    }
+
+    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
+    function buildDateOptions() {
+        const select = document.getElementById('datePicker');
+        select.innerHTML = '';
+        const today = new Date();
+        for (let i = 0; i < 30; i++) {
+            const d = new Date(today);
+            d.setDate(today.getDate() + i);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            const val = `${y}-${m}-${day}`;
+            const weekdays = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+            const wd = weekdays[d.getDay()];
+            select.appendChild(new Option(`${val} (${wd})`, val));
+        }
+    }
+
+    function generateTimeOptions(selectId, isStart = true, selectedStart = null) {
+        const target = document.getElementById(selectId);
+        target.innerHTML = '<option value="">-- Время --</option>';
+        if (isStart) {
+            const offOption = document.createElement('option');
+            offOption.value = 'off';
+            offOption.textContent = 'Выходной';
+            target.appendChild(offOption);
+        }
+        for (let h = 6; h <= 23; h++) {
+            for (let m of [0, 15, 30, 45]) {
+                if (isStart && h === 6 && m < 30) continue;
+                const timeStr = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+                target.appendChild(new Option(timeStr, timeStr));
+            }
+        }
+        if (!isStart && selectedStart && selectedStart !== 'off') {
+            filterEndTimes(selectedStart);
+        }
+    }
+
+    function filterEndTimes(startTime) {
+        const endSelect = document.getElementById('endHourSelect');
+        if (!startTime || startTime === 'off') {
+            endSelect.disabled = true;
+            endSelect.innerHTML = '<option value="">-- Выходной --</option>';
+            return;
+        }
+        endSelect.disabled = false;
+        const [startH, startM] = startTime.split(':').map(Number);
+        const startTotal = startH * 60 + startM;
+        endSelect.innerHTML = '<option value="">-- Выберите окончание --</option>';
+        for (let h = 0; h <= 24; h++) {
+            for (let m of [0, 15, 30, 45]) {
+                if (h === 24 && m > 0) continue;
+                let endTotal = h * 60 + m;
+                let displayHour = h;
+                let suffix = '';
+                if (h === 24) { displayHour = 0; suffix = ' (след. день)'; }
+                if (h < 6 && h !== 0 && !(h===0 && m===0)) continue;
+                let adjustedEnd = endTotal;
+                if (h < 6 && h !== 24) adjustedEnd += 24*60;
+                if (adjustedEnd <= startTotal) continue;
+                let duration = adjustedEnd - startTotal;
+                if (duration > 720) continue;
+                const timeVal = `${String(displayHour).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+                endSelect.appendChild(new Option(timeVal + suffix, timeVal));
+            }
+        }
+        if (endSelect.options.length === 1) endSelect.innerHTML = '<option>Нет доступных вариантов</option>';
+    }
+
+    function getConsecutiveStatus(workerShifts, newDateStr) {
+        if (!workerShifts.length) return { ok: true, count: 1 };
+        const allDates = [...workerShifts.map(s => s.date), newDateStr].sort();
+        let maxSeq = 1, cur = 1;
+        for (let i = 1; i < allDates.length; i++) {
+            const diff = (new Date(allDates[i]) - new Date(allDates[i-1])) / (1000*3600*24);
+            if (diff === 1) cur++;
+            else cur = 1;
+            if (cur > maxSeq) maxSeq = cur;
+        }
+        return { ok: maxSeq <= 6, count: maxSeq };
+    }
+
+    function addShiftToWorker(dept, team, workerName, shiftData) {
+        let worker = allStaff.find(w => w.dept === dept && w.team === team && w.name === workerName);
+        if (!worker) {
+            worker = { dept, team, name: workerName, shifts: [] };
+            allStaff.push(worker);
+        }
+        const already = worker.shifts.find(s => s.date === shiftData.date);
+        if (already) {
+            alert('Смена на эту дату уже существует');
+            return false;
+        }
+        const consec = getConsecutiveStatus(worker.shifts, shiftData.date);
+        if (!consec.ok) {
+            alert(`❌ Ошибка: будет ${consec.count} смен подряд. Допустимо не более 6.`);
+            return false;
+        }
+        worker.shifts.push(shiftData);
+        localStorage.setItem('workforce_v2', JSON.stringify(allStaff));
+        if (autoSaveEnabled) autoExportToJSON();
+        return true;
+    }
+
+    function renderStats() {
+        let totalShifts = 0, before11 = 0, after19 = 0, longShifts = 0, workersOver6 = 0;
+        const dayCount = [0,0,0,0,0,0,0];
+        for (let w of allStaff) {
+            let maxCons=0;
+            const dates = w.shifts.map(s=>s.date).sort();
+            let cur=1;
+            for(let i=1;i<dates.length;i++){
+                const diff = (new Date(dates[i])-new Date(dates[i-1]))/86400000;
+                diff===1 ? cur++ : cur=1;
+                if(cur>maxCons) maxCons=cur;
+            }
+            if(maxCons>6) workersOver6++;
+            for(let s of w.shifts) {
+                totalShifts++;
+                const day = new Date(s.date).getDay();
+                const idx = day===0?6:day-1;
+                dayCount[idx]++;
+                if(s.startTime !== 'off') {
+                    const h = parseInt(s.startTime.split(':')[0]);
+                    if(h<11) before11++;
+                    if(s.endTime && s.endTime !== '') {
+                        let eh = parseInt(s.endTime.split(':')[0]);
+                        if(s.endTime.includes('след') || (eh===0 && s.startTime !=='off')) eh=24;
+                        if(eh>=19) after19++;
+                        let startM = parseInt(s.startTime.split(':')[0])*60+parseInt(s.startTime.split(':')[1]);
+                        let endM = eh*60 + parseInt(s.endTime.split(':')[1]);
+                        if(eh<6 && eh!==0) endM+=1440;
+                        if(endM-startM > 720) longShifts++;
+                    }
+                }
+            }
+        }
+
+        const statsHtml = `<div><span class="stats-value">${totalShifts}</span> <span>всего смен</span></div>
+        <hr><div>🌅 До 11:00: ${totalShifts?((before11/totalShifts)*100).toFixed(1):0}%</div>
+        <div>🌙 После 19:00: ${totalShifts?((after19/totalShifts)*100).toFixed(1):0}%</div>
+        <div>⏱️ >12ч: ${longShifts} смен</div>
+        <div>⚠️ Сотрудников с 7+ подряд: ${workersOver6}</div>
+        <hr><div><strong>Распределение:</strong><br>${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map((d,i)=>`${d}: ${totalShifts?((dayCount[i]/totalShifts)*100).toFixed(1):0}%`).join('<br>')}</div>`;
+        document.getElementById('statsContent').innerHTML = statsHtml;
+    }
+
+    function updateTeams() {
+        const dept = document.getElementById('deptSelect').value;
+        const teamSel = document.getElementById('teamSelect');
+        const workerSel = document.getElementById('workerSelect');
+        teamSel.innerHTML = '<option value="">— Выберите команду —</option>';
+        workerSel.innerHTML = '<option value="">— Сначала команду —</option>';
+        workerSel.disabled = true;
+        if(dept && departmentsData[dept]) {
+            departmentsData[dept].forEach(t => {
+                teamSel.appendChild(new Option(t.name, t.name));
+            });
+            teamSel.disabled = false;
+        } else { teamSel.disabled = true; workerSel.disabled = true; }
+        document.getElementById('addFormBlock').style.display = dept ? 'block' : 'none';
+    }
+
+    function updateWorkers() {
+        const dept = document.getElementById('deptSelect').value;
+        const team = document.getElementById('teamSelect').value;
+        const workerSel = document.getElementById('workerSelect');
+        workerSel.innerHTML = '<option value="">— Сотрудник —</option>';
+        if(dept && team && departmentsData[dept]) {
+            const found = departmentsData[dept].find(t => t.name === team);
+            if(found) {
+                found.workers.forEach(w => workerSel.appendChild(new Option(w, w)));
+                workerSel.disabled = false;
+            } else workerSel.disabled = true;
+        } else workerSel.disabled = true;
+    }
+
+    let modalCallback = null;
+    function openConfirmModal(msg, callback) {
+        const modal = document.getElementById('globalModal');
+        document.getElementById('modalMsgText').innerText = msg;
+        modalCallback = callback;
+        modal.style.display = 'flex';
+        document.getElementById('modalConfirmBtn').onclick = () => {
+            if(modalCallback) modalCallback();
+            modal.style.display = 'none';
+        };
+        document.getElementById('modalCancelBtn').onclick = () => modal.style.display = 'none';
+    }
+
+    function initApp() {
+        document.getElementById('userNameDisplay').innerHTML = `👋 ${currentUser.name} ${isAdmin() ? '<span class="admin-badge">Администратор</span>' : '<span class="user-badge">Сотрудник</span>'}`;
+        
+        buildDateOptions();
+        generateTimeOptions('startHourSelect', true);
+        renderAllTables();
+        renderStats();
+        updateTeams();
+        
+        startAutoSave();
+        
+        document.getElementById('startHourSelect').addEventListener('change', (e) => {
+            const val = e.target.value;
+            if(val === 'off') {
+                document.getElementById('endHourSelect').disabled = true;
+                document.getElementById('endHourSelect').innerHTML = '<option>Выходной</option>';
+            } else if(val) filterEndTimes(val);
+            else { document.getElementById('endHourSelect').disabled = true; }
+        });
+
+        document.getElementById('addShiftBtn').addEventListener('click', () => {
+            const dept = document.getElementById('deptSelect').value;
+            const team = document.getElementById('teamSelect').value;
+            const worker = document.getElementById('workerSelect').value;
+            const date = document.getElementById('datePicker').value;
+            let start = document.getElementById('startHourSelect').value;
+            const end = document.getElementById('endHourSelect').value;
+            if(!dept || !team || !worker || !date || !start) { alert('Заполните все поля'); return; }
+            if(start !== 'off' && !end) { alert('Укажите конец смены'); return; }
+            const shiftObj = { date, startTime: start === 'off' ? 'off' : start, endTime: (start !== 'off' && end) ? end : '' };
+            const success = addShiftToWorker(dept, team, worker, shiftObj);
+            if(success) {
+                renderAllTables();
+                renderStats();
+                document.getElementById('startHourSelect').value = '';
+                document.getElementById('endHourSelect').innerHTML = '<option>-- Время --</option>';
+                document.getElementById('endHourSelect').disabled = true;
+                document.getElementById('warningMsg').style.display = 'none';
+            } else {
+                document.getElementById('warningMsg').style.display = 'block';
+                document.getElementById('warningMsg').innerText = '❗ Нарушение: не более 6 смен подряд';
+            }
+        });
+
+        document.getElementById('deptSelect').addEventListener('change', updateTeams);
+        document.getElementById('teamSelect').addEventListener('change', updateWorkers);
+        
+        document.getElementById('excelExportBtn').onclick = exportToExcel;
+        document.getElementById('restoreBtn').onclick = restoreFromBackup;
+        
+        let autoSaveEnabledLocal = true;
+        document.getElementById('autoSaveToggle').onclick = function() {
+            if (autoSaveEnabledLocal) {
+                stopAutoSave();
+                this.textContent = '▶️ Автосохранение Выкл';
+                this.style.background = '#2ecc71';
+                autoSaveEnabledLocal = false;
+                autoSaveEnabled = false;
+            } else {
+                startAutoSave();
+                this.textContent = '⏸️ Автосохранение Вкл';
+                this.style.background = '#e74c3c';
+                autoSaveEnabledLocal = true;
+                autoSaveEnabled = true;
+                autoExportToJSON();
+            }
+        };
+    }
+
+    checkAuth();
+</script>
+</body>
+</html>
