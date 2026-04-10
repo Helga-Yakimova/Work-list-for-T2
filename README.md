@@ -1,2 +1,2 @@
 В рамках хакатона наша команда сделала сайт и вот ссылка на его просмотр
-ссылка для просмотра сайта<"https://helga-yakimova.github.io/Work-list-for-T2/">
+ссылка для просмотра сайта(https://helga-yakimova.github.io/Work-list-for-T2/)
